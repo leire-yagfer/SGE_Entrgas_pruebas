@@ -1,15 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
 class Palabra:
     # defino las variables del constructor
     def __init__(self, palabra_original, traduccion, categoria, aprendida=False):
@@ -53,9 +41,10 @@ class Vocabulario:
         self.lista_palabras = []  # lista de palabras
 
     # función que me permite añadir una nueva palabra a la lista de vocabulario (instancia de Palabra)
-    def agregar_palabra(self, palabra_agregar, traduccion, categoria):
+    def agregar_palabra(self, palabra_agregar, traduccion, categoria, usuario):
         palabra_nueva = Palabra(palabra_agregar, traduccion, categoria)  # creo la nueva palabra como instancia de la clase Palabra
-        self.lista_palabras.append(palabra_nueva)  # añado la palabra a la lista
+        self.lista_palabras.append(palabra_nueva)  # añado la palabra a la lista global
+        usuario.agregar_palabra(palabra_nueva)  # también la añado al vocabulario del usuario
 
     # función que muestra una lista de vocabulario
     def listar_palabras(self):
@@ -63,10 +52,10 @@ class Vocabulario:
             print(cursor.mostrar_datos_palabra())  # puedo utilizar la función mostrar_datos_palabra() porque tiene una instancia de la clase Palabra (concedida en la función anterior)
 
     # función que permite al usuario practicar el vocabulario
-    def practicar_vocabulario(self):
+    def practicar_vocabulario(self, usuario):
         import random  # importo la librería random
-        if self.lista_palabras:  # si no está vacía la lista
-            palabra_random = random.choice(self.lista_palabras)  # muestro una palabra random de la lista
+        if usuario.vocabulario:  # si no está vacía la lista del usuario
+            palabra_random = random.choice(usuario.vocabulario)  # muestro una palabra random del vocabulario del usuario
             respuesta = input(f"¿Cuál es la traducción de '{palabra_random.palabra_original}'? ")  # obtengo la respuesta del usuario
             # {palabra_random.palabra_original} --> obtengo el valor de la palabra en el idioma que el usuario está tratando de aprender
             if respuesta.lower() == palabra_random.traduccion.lower():  # compruebo que coinciden, poniéndolas en minúsculas
@@ -79,25 +68,13 @@ class Vocabulario:
             print("No hay palabras en el vocabulario para practicar.")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 #función principal
 def main():
     usuario = Usuario("Usuario")  # creo una instancia de Usuario
     vocabulario = Vocabulario()   # creo una instancia de Vocabulario
 
     while True:  # bucle infinito para mostrar el menú hasta que el usuario decida salir
-        opcion = input("---- Menú Principal. Seleccione una opción: ---- \n 1. Agregar Palabra \n 2. Listar Vocabulario \n 3. Practicar Vocabulario \n 4. Salir")   
+        opcion = input("---- Menú Principal. Seleccione una opción: ---- \n 1. Agregar Palabra \n 2. Listar Vocabulario \n 3. Practicar Vocabulario \n 4. Salir\n")   
         
         if opcion not in ['1', '2', '3', '4']:  # valido la opción
             print("Opción no válida. Por favor, seleccione una opción del 1 al 4.")
@@ -108,15 +85,15 @@ def main():
                 palabra = input("Ingrese la palabra en el idioma original: ")
                 traduccion = input("Ingrese la traducción: ")
                 categoria = input("Ingrese la categoría: ")
-                vocabulario.agregar_palabra(palabra, traduccion, categoria)  # agrega la palabra al vocabulario
+                vocabulario.agregar_palabra(palabra, traduccion, categoria, usuario)  # agrega la palabra al vocabulario global y del usuario
                 print("Palabra agregada con éxito.")
 
-            case "2":  # listar vocabulario
-                print("Vocabulario:")
-                vocabulario.listar_palabras()  # lista las palabras del vocabulario
+            case "2":  # listar vocabulario del usuario
+                print("Vocabulario del usuario:")
+                usuario.listar_vocabulario()  # lista las palabras del vocabulario del usuario
 
             case "3":  # practicar vocabulario
-                vocabulario.practicar_vocabulario()  # permite al usuario practicar el vocabulario
+                vocabulario.practicar_vocabulario(usuario)  # permite al usuario practicar el vocabulario
 
             case "4":  # salir
                 print("¡Hasta luego!")
